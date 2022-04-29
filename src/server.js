@@ -134,6 +134,7 @@ const init = async () => {
             options: {
                 playlistsongsService,
                 playlistsService,
+                songsService,
                 validator: PlaylistsongsValidator
             }
         },
