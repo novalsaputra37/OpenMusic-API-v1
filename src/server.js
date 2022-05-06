@@ -126,7 +126,8 @@ const init = async () => {
             plugin: collaborations,
             options: {
                 collaborationsService,
-                userService,
+                playlistsService,
+                usersService: userService,
                 validator: CollaborationsValidator
             }
         },
@@ -147,14 +148,14 @@ const init = async () => {
                 validator: PlaylistsongsValidator
             }
         },
-        {
-            plugin: _exports,
-            options: {
-                service: ProducerService,
-                validator: ExportsValidator,
-                playlistsService,
-            },
-        },
+        // {
+        //     plugin: _exports,
+        //     options: {
+        //         service: ProducerService,
+        //         validator: ExportsValidator,
+        //         playlistsService,
+        //     },
+        // },
     ]);
 
     await server.start();
