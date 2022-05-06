@@ -35,7 +35,7 @@ class UserAlbumLikesService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!result.rows.length) {
       throw new InvariantError(
         'Gagal membatalkan album yang disukai. Id tidak ditemukan'
       );
@@ -62,11 +62,11 @@ class UserAlbumLikesService {
 
       await this._cacheService.set(
         `useralbumlikes:${albumId}`,
-        JSON.stringify(result.rowCount)
+        JSON.stringify(result.rows.length)
       );
 
       return {
-        number: result.rowCount,
+        number: result.rows.length,
         source: 'db',
       };
     }
@@ -80,7 +80,7 @@ class UserAlbumLikesService {
 
     const result = await this._pool.query(query);
 
-    return result.rowCount;
+    return result.rows.length;
   }
 }
 
