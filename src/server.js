@@ -3,6 +3,7 @@ require('dotenv').config();
 //hapi
 const Hapi = require('@hapi/hapi');
 const Jwt = require("@hapi/jwt");
+// const Inert = require('@hapi/inert');
 
 // Album
 const albums = require('./api/album');
@@ -40,6 +41,11 @@ const playlistsongs = require("./api/playlistsong");
 const PlaylistsongsService = require("./services/postgres/PlaylistsongsService");
 const PlaylistsongsValidator = require("./validator/playlistsongs");
 
+//RabitMQ
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
 const init = async () => {
     const albumsService = new AlbumsService();
     const songsService = new SongsService();
@@ -64,6 +70,9 @@ const init = async () => {
         {
         plugin: Jwt,
         },
+        // {
+        // plugin: Inert,
+        // },
     ]);
 
     server.auth.strategy("playlistsapp_jwt", "jwt", {
@@ -137,6 +146,14 @@ const init = async () => {
                 songsService,
                 validator: PlaylistsongsValidator
             }
+        },
+        {
+            plugin: _exports,
+            options: {
+                service: ProducerService,
+                validator: ExportsValidator,
+                playlistsService,
+            },
         },
     ]);
 
