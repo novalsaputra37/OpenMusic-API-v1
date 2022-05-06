@@ -179,14 +179,14 @@ const init = async () => {
         albumsService,
       },
     },
-    // {
-    //     plugin: _exports,
-    //     options: {
-    //         service: ProducerService,
-    //         validator: ExportsValidator,
-    //         playlistsService,
-    //     },
-    // },
+    {
+        plugin: _exports,
+        options: {
+            service: ProducerService,
+            validator: ExportsValidator,
+            playlistsService,
+        },
+    },
   ]);
 
   await server.start();
