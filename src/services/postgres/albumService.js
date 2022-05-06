@@ -5,78 +5,92 @@ const NotFoundError = require('../../exceptions/notFoundError');
 const { mapDBtoModel } = require('../../utils');
 
 class AlbumService {
-    constructor() {
-        this._pool = new Pool();
+  constructor() {
+    this._pool = new Pool();
+  }
+
+  //add new album
+  async addAlbum({ name, year }) {
+    const fromNanoId = nanoid(16);
+    const id = `album-${fromNanoId}`;
+
+    const query = {
+      text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
+      values: [id, name, year],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows[0].id) {
+      throw new InvariantError('Album gagal ditambahkan');
     }
 
-    //add new album
-    async addAlbum({ name, year }) {
-        const fromNanoId = nanoid(16);
-        const id = `album-${fromNanoId}`
+    return result.rows[0].id;
+  }
 
-        const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
-            values: [id, name, year]
-        }
+  //View all albums
+  async getAlbum() {
+    const result = await this._pool.query('SELECT * FROM albums');
+    return result.rows.map(mapDBtoModel);
+  }
 
-        const result = await this._pool.query(query);
-        
-        if(!result.rows[0].id) {
-            throw new InvariantError('Album gagal ditambahkan');
-        }
+  //get detail album
+  async getAlbumById(id) {
+    const query = {
+      text: 'SELECT * FROM albums WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
 
-        return result.rows[0].id;
+    if (!result.rows.length) {
+      throw new NotFoundError('album tidak ditemukan');
+    }
+
+    return result.rows.map(mapDBtoModel)[0];
+  }
+
+  //put album
+  async putAlbumById(id, { name, year }) {
+    const query = {
+      text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
+      values: [name, year, id],
     };
 
-    //View all albums
-    async getAlbum(){
-        const result = await this._pool.query('SELECT * FROM albums');
-        return result.rows.map(mapDBtoModel)
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+    }
+  }
+
+  //Delete Album
+  async daleteAlbumById(id) {
+    const query = {
+      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      values: [id],
     };
 
-    //get detail album
-    async getAlbumById(id){
-        const query = {
-            text: 'SELECT * FROM albums WHERE id = $1',
-            values: [id],
-        }
-        const result = await this._pool.query(query);
+    const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
-            throw new NotFoundError('album tidak ditemukan');
-        }
+    if (!result.rows.length) {
+      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
+    }
+  }
 
-        return result.rows.map(mapDBtoModel)[0];
+  async addAlbumCoverById(id, file) {
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      values: [file, id],
     };
 
-    //put album
-    async putAlbumById(id, { name, year }) {
-        const query = {
-            text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
-            values: [name, year, id]
-        };
+    const result = await this._pool.query(query);
 
-        const result = await this._pool.query(query);
+    if (!result.rows[0].id) {
+      throw new InvariantError('Sampul gagal diunggah');
+    }
 
-        if (!result.rows.length){
-            throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
-        }
-    };
-
-    //Delete Album
-    async daleteAlbumById(id){
-        const query = {
-            text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
-            values: [id],
-        };
-
-        const result = await this._pool.query(query);
-
-        if(!result.rows.length) {
-            throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan')
-        }
-    };
-
+    return result.rows[0].id;
+  }
 }
 
 module.exports = AlbumService;
