@@ -1,8 +1,8 @@
 const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
 const InvariantError = require("../../exceptions/InvariantError");
-const { PlaylistMapDBToModel } = require("../../utils");
 const NotFoundError = require("../../exceptions/NotFoundError");
+const { PlaylistMapDBToModel } = require("../../utils");
 
 class PlaylistsongsService {
   constructor() {
