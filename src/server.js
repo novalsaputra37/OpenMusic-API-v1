@@ -39,7 +39,7 @@ const CollaborationsValidator = require('./validator/collaborations');
 
 // playlistsongs
 const playlistsongs = require('./api/playlistsong');
-const PlaylistsongsService = require('./services/postgres/PlaylistsongsService');
+const PlaylistsongsService = require('./services/postgres/playlistsongsService');
 const PlaylistsongsValidator = require('./validator/playlistsongs');
 
 //Uploads
